@@ -27,7 +27,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         #'NAME': normpath(join(DJANGO_ROOT, 'default.db')),
-        'NAME': 'pumpkin',
+        'NAME': 'pumpkin_dev',
         'USER': 'ata',
         'PASSWORD': 'rahasia',
         'HOST': '',

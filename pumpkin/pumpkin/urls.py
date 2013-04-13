@@ -5,13 +5,16 @@ from django.views.generic import TemplateView
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    url(r'^$', TemplateView.as_view(template_name='base.html')),
+urlpatterns = patterns('pumpkin.views',
+    url(r'^$','home', name='home'),
+)
+
+
+urlpatterns += patterns('',
 
     # Examples:
-    # url(r'^$', 'pumpkin.views.home', name='home'),
     # url(r'^pumpkin/', include('pumpkin.foo.urls')),
-    url(r'account/', include('django.contrib.auth.urls')),
+    url(r'accounts/', include('django.contrib.auth.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

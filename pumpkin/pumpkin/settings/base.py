@@ -45,10 +45,11 @@ MANAGERS = ADMINS
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        #'NAME': normpath(join(DJANGO_ROOT, 'default.db')),
+        'NAME': 'pumpkin',
+        'USER': 'ata',
+        'PASSWORD': 'rahasia',
         'HOST': '',
         'PORT': '',
     }
@@ -191,6 +192,7 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
+    'pumpkin',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -240,3 +242,4 @@ LOGIN_REDIRECT_URL = '/'
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = 'wsgi.application'
 ########## END WSGI CONFIGURATION
+

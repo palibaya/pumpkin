@@ -1,6 +1,8 @@
 # -*- coding: utf-8 *-*
 import os
 import urlparse
+import logging
+from selenium import webdriver
 # This is necessary for all installed apps to be recognized, for some reason.
 os.environ['DJANGO_SETTINGS_MODULE'] = 'pumpkin.settings.test'
 
@@ -13,27 +15,36 @@ def before_all(context):
     setup_environ(settings)
 
     ### Take a TestRunner hostage.
-    from django.test.simple import DjangoTestSuiteRunner
+    from discover_runner import DiscoverRunner
     # We'll use thise later to frog-march Django through the motions
     # of setting up and tearing down the test environment, including
     # test databases.
-    context.runner = DjangoTestSuiteRunner()
+
+
+    context.runner = DiscoverRunner(verbosity=0)
+
 
     ## If you use South for migrations, uncomment this to monkeypatch
     ## syncdb to get migrations to run.
-    # from south.management.commands import patch_for_test_db_setup
-    # patch_for_test_db_setup()
+    from south.management.commands import patch_for_test_db_setup
+    patch_for_test_db_setup()
 
-    ### Set up the WSGI intercept "port".
-    import wsgi_intercept
-    from django.core.handlers.wsgi import WSGIHandler
     host = context.host = 'localhost'
-    port = context.port = getattr(settings,
-                                  'TESTING_MECHANIZE_INTERCEPT_PORT', 17681)
+    port = context.port = getattr(settings, 'TESTING_SERVER_PORT', 8081)
     # NOTE: Nothing is actually listening on this port. wsgi_intercept
     # monkeypatches the networking internals to use a fake socket when
     # connecting to this port.
-    wsgi_intercept.add_wsgi_intercept(host, port, WSGIHandler)
+
+    from django.test.testcases import LiveServerThread
+
+    context.server_thread = LiveServerThread(host, [port])
+    context.server_thread.daemon = True
+    context.server_thread.start()
+    # Wait for the live server to be ready
+    context.server_thread.is_ready.wait()
+    if context.server_thread.error:
+        raise context.server_thread.error
+
 
     def browser_url(url):
         """Create a URL for the virtual WSGI server.
@@ -44,44 +55,35 @@ def before_all(context):
 
     context.browser_url = browser_url
 
-    ### BeautifulSoup is handy to have nearby.
-    # (Substitute lxml or html5lib as you see fit)
-    from BeautifulSoup import BeautifulSoup
+    #looger
+    selenium_logger = logging.getLogger(
+        'selenium.webdriver.remote.remote_connection')
+    selenium_logger.setLevel(logging.WARN)
+    south_logger=logging.getLogger('south')
+    south_logger.setLevel(logging.WARN)
 
-    def parse_soup():
-        """
-        Use BeautifulSoup to parse the current response and return
-        the DOM tree.
-        """
-        r = context.browser.response()
-        html = r.read()
-        r.seek(0)
-        return BeautifulSoup(html)
 
-    context.parse_soup = parse_soup
 
 
 def before_scenario(context, scenario):
-    # Set up the scenario test environment
-    context.runner.setup_test_environment()
-    # We must set up and tear down the entire database between
-    # scenarios. We can't just use db transactions, as Django's
-    # TestClient does, if we're doing full-stack tests with Mechanize,
-    # because Django closes the db connection after finishing the HTTP
-    # response.
-    context.old_db_config = context.runner.setup_databases()
 
-    ### Set up the Mechanize browser.
-    from wsgi_intercept import mechanize_intercept
-    # MAGIC: All requests made by this monkeypatched browser to the magic
-    # host and port will be intercepted by wsgi_intercept via a
-    # fake socket and routed to Django's WSGI interface.
-    browser = context.browser = mechanize_intercept.Browser()
-    browser.set_handle_robots(False)
+    # fix bug django
+    from django.db import connections, DEFAULT_DB_ALIAS
+    connections[DEFAULT_DB_ALIAS].settings_dict['NAME'] = 'pumpkin'
+
+    # setUp
+    context.runner.setup_test_environment()
+    context.old_db_config = context.runner.setup_databases()
+    context.browser = webdriver.PhantomJS()
 
 
 def after_scenario(context, scenario):
-    # Tear down the scenario test environment.
+    # setDown
+    context.browser.quit()
     context.runner.teardown_databases(context.old_db_config)
     context.runner.teardown_test_environment()
-    # Bob's your uncle.
+
+
+def after_all(context):
+    context.server_thread.join()
+
