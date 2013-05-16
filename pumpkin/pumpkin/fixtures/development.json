@@ -1,0 +1,13 @@
+[
+{
+    "pk": 1, 
+    "model": "pumpkin.testserver", 
+    "fields": {
+        "ssh_port": 2222, 
+        "username": "pumpkin", 
+        "host": "127.0.0.1", 
+        "password": "pumpkin", 
+        "name": "VBox Server 1"
+    }
+}
+]

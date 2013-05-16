@@ -1,0 +1,26 @@
+{% extends "project.html" %}
+
+{% block title %}Project - {{ project.name }} - Configure{% endblock %}
+
+{% block content_project %}
+<form class="form-horizontal" method="post">
+    {% csrf_token %}
+    <legend>{{ project.name }} - Configure</legend>
+    {% for field in project_form %}
+    <div class="control-group">
+        <label class="control-label" for="{{ field.name }}">{{ field.label }}</label>
+        <div class="controls">
+            {{ field }}
+        </div>
+    </div>
+    {% endfor %}
+    <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+  </div>
+</form>
+
+{% endblock content_project %}
+

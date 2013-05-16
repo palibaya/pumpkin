@@ -1,0 +1,27 @@
+{% extends "project.html" %}
+
+{% block title %}Project - {{ project.name }} - Jobs {% endblock %}
+
+{% block content_project %}
+<table class="table table-border">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Last Success</th>
+            <th>Last Failure</th>
+            <th>Last Duration</th>
+            <th> </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><a href="#">Behat</a></a></td>
+            <td>2013-01-02 22:00</td>
+            <td>2013-01-02 21:00</td>
+            <td>7 sec</td>
+            <td><a href="#"><i class="icon-play-circle"></i></a></td>
+        </tr>
+    </tbody>
+</table>
+{% endblock content_project %}
+

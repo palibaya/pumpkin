@@ -14,6 +14,9 @@ urlpatterns += patterns('',
 
     # Examples:
     # url(r'^pumpkin/', include('pumpkin.foo.urls')),
+    url(r'^project/(?P<identifier>\w+)/$', 'pumpkin.views.project'),
+    url(r'^project/(?P<identifier>\w+)/configure/$', 'pumpkin.views.project_configure'),
+    url(r'^project/(?P<identifier>\w+)/jobs/$', 'pumpkin.views.project_jobs'),
     url(r'accounts/', include('django.contrib.auth.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

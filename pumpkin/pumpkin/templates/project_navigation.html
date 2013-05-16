@@ -1,0 +1,17 @@
+<ul class="nav nav-list">
+
+    {% url 'pumpkin.views.project' identifier=project.identifier as url %}
+    <li{% if request.path == url %} class="active"{% endif %}>
+        <a href="{{ url }}">Summary</a>
+    </li>
+
+    {% url 'pumpkin.views.project_jobs' identifier=project.identifier as url %}
+    <li{% if request.path == url %} class="active"{% endif %}>
+        <a href="{{ url }}">Jobs</a>
+    </li>
+
+    {% url 'pumpkin.views.project_configure' identifier=project.identifier as url %}
+    <li{% if request.path == url  %} class="active"{% endif %}>
+        <a href="{{ url }}">Configure</a>
+    </li>
+</ul>
