@@ -1,0 +1,19 @@
+[
+{
+    "pk": 1, 
+    "model": "pumpkin.project", 
+    "fields": {
+        "managers": [
+            2
+        ], 
+        "name": "Melon", 
+        "members": [
+            2, 
+            4
+        ], 
+        "test_server": 1, 
+        "identifier": "melon", 
+        "description": "Melon bla..bla.."
+    }
+}
+]

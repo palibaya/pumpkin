@@ -1,0 +1,29 @@
+[
+{
+    "pk": 1,
+    "model": "pumpkin.build",
+    "fields": {
+        "job": 1,
+        "command": "ls /",
+        "sequence": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "pumpkin.build",
+    "fields": {
+        "job": 1,
+        "command": "ls /usr",
+        "sequence": 2
+    }
+},
+{
+    "pk": 3,
+    "model": "pumpkin.build",
+    "fields": {
+        "job": 1,
+        "command": "blah",
+        "sequence": 4
+    }
+}
+]
