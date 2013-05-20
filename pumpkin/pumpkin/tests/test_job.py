@@ -11,3 +11,5 @@ class JobTestCase(TestCase):
         build_logs = job.build_logs.order_by('sequence')
         statuses = [l.status for l in build_logs]
         self.assertEqual(['success', 'success', 'failure'], statuses)
+        job_log = job.logs.order_by('-id')[0]
+        self.assertEqual('partial', job_log.status)

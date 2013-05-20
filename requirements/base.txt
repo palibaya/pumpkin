@@ -10,3 +10,4 @@ paramiko
 https://github.com/sternoru/django-dynamic-settings/archive/master.zip#django-dynamic-settings
 pygments
 GitPython
+django-admin-bootstrapped

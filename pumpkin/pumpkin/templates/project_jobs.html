@@ -7,20 +7,22 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Last Success</th>
-            <th>Last Failure</th>
+            <th>Last Running</th>
+            <th>Last Status</th>
             <th>Last Duration</th>
             <th> </th>
         </tr>
     </thead>
     <tbody>
+        {% for job in project.jobs.all %}
         <tr>
-            <td><a href="#">Behat</a></a></td>
-            <td>2013-01-02 22:00</td>
-            <td>2013-01-02 21:00</td>
-            <td>7 sec</td>
+            <td><a href="{% url 'pumpkin.views.project_job_logs' identifier=project.identifier job_id=job.id %}">{{ job.name }}</a></td>
+            <td>{{ job.last_run.begin }}</td>
+            <td>{{ job.last_run.status }}</td>
+            <td>{{ job.last_duration }}</td>
             <td><a href="#"><i class="icon-play-circle"></i></a></td>
         </tr>
+        {% endfor %}
     </tbody>
 </table>
 {% endblock content_project %}

@@ -25,6 +25,15 @@ def project_jobs(request, identifier):
         'project': project
     })
 
+def project_job_logs(request, identifier, job_id):
+    job = models.Job.objects.get(id=job_id)
+    logs = job.logs.order_by('-end').all()
+    return render(request, 'project_job_logs.html', {
+        'project': job.project,
+        'job': job,
+        'logs': logs
+    })
+
 def project_configure(request, identifier):
     project = models.Project.objects.get(identifier=identifier)
     project_form = forms.ProjectForm(instance=project)

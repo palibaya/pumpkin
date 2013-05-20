@@ -37,9 +37,6 @@
           <a class="brand" href="/">pumpkin</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="#">Blah</a></li>
-              <li><a href="#">Blah</a></li>
-              <li><a href="#">Blah</a></li>
               <li class="dropdown">
                 <a class="dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="#">
                     Project
@@ -47,10 +44,11 @@
                 </a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                     {% for p in projects %}
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="{% url 'pumpkin.views.project' identifier=p.identifier %}">{{ p.name }}</a></li>
                     {% endfor %}
                 </ul>
               </li>
+              <li><a href="/admin" target="_blank">Administrator</a></li>
             </ul>
 
 
@@ -70,7 +68,7 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 
     <!-- place project specific Javascript in this file -->

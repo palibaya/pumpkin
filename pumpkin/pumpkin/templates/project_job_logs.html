@@ -1,0 +1,25 @@
+{% extends "project.html" %}
+
+{% block title %}Project - {{ project.name }} - Jobs {% endblock %}
+
+{% block content_project %}
+<table class="table table-border">
+    <thead>
+        <tr>
+            <th>Date Time</th>
+            <th>Status</th>
+            <th>Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.begin }}</td>
+            <td>{{ log.status }}</td>
+            <td>{{ log.duration }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock content_project %}
+

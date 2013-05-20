@@ -17,6 +17,8 @@ urlpatterns += patterns('',
     url(r'^project/(?P<identifier>\w+)/$', 'pumpkin.views.project'),
     url(r'^project/(?P<identifier>\w+)/configure/$', 'pumpkin.views.project_configure'),
     url(r'^project/(?P<identifier>\w+)/jobs/$', 'pumpkin.views.project_jobs'),
+    url(r'^project/(?P<identifier>\w+)/job/(?P<job_id>\d+)/logs$',
+        'pumpkin.views.project_job_logs'),
     url(r'accounts/', include('django.contrib.auth.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

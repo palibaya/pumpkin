@@ -81,6 +81,9 @@ class Project(BaseModel):
         return reverse('pumpkin.views.project',
                        args=[str(self.identifier)])
 
+    def workspace_path(self):
+        return '$HOME/%s' % self.identifier.replace('-','_')
+
 
 class JobLog(BaseModel):
     STATUS_CHOICES = (
@@ -92,6 +95,14 @@ class JobLog(BaseModel):
     begin = models.DateTimeField()
     end = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES)
+
+
+    def duration(self):
+        return self.end - self.begin
+
+
+    def __unicode__(self):
+        return 'Job Log #%s: %s' % (self.id, self.job)
 
 class Job(BaseModel):
     name = models.CharField(max_length=255)
@@ -116,13 +127,18 @@ class Job(BaseModel):
         job_log.begin = current_tz.localize(datetime.now())
         job_log.save()
         build_count = self.builds.count()
-        statuses = []
+        success_count = 0
+        failure_count = 0
         for build in self.builds.all():
             build_log = build.run(runner=self._runner, job_log=job_log)
-            statuses.append(build_log.status)
-        if build_count == len(statuses) and 'success' in statuses:
+            if build_log.status == 'success':
+                success_count += 1
+            if build_log.status == 'failure':
+                failure_count += 1
+
+        if build_count == success_count:
             job_log.status = 'success'
-        elif build_count == len(statuses) and 'failure' in statuses:
+        elif build_count == failure_count:
             job_log.status = 'failure'
         else:
             job_log.status = 'partial'
@@ -139,6 +155,31 @@ class Job(BaseModel):
         if len(lasts) > 0:
             return lasts[0]
 
+    def last_success(self):
+        logs = self.logs.filter(status='success').order_by('-end')
+        if len(logs) > 0:
+            return logs[0]
+
+
+    def last_failure(self):
+        logs =  self.logs.filter(status='failure').order_by('-end')
+        if len(logs) > 0:
+            return logs[0]
+
+    def last_run(self):
+        if hasattr(self, '_last_run'):
+            return self._last_run
+        else:
+            logs =  self.logs.order_by('-end')
+            if len(logs) > 0:
+                self._last_run = logs[0]
+            else:
+                self._last_run = None
+        return self._last_run
+
+    def last_duration(self):
+        if self.last_run() is not None:
+            return self.last_run().duration()
 
 class Queue(BaseModel):
     name = models.CharField(max_length=255)
@@ -171,7 +212,9 @@ class BuildLog(BaseModel):
     status = models.CharField(max_length=16, choices=STATUS_CHOICES)
 
     def __unicode__(self):
-        return 'Build Log #%s: %s' % (self.id, self.begin)
+        return 'Build Log #%s: %s - %s' % (
+            self.id, self.job, self.begin
+        )
 
 class Build(BaseModel):
     '''
