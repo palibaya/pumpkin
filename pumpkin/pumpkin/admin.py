@@ -16,6 +16,16 @@ class JobAdmin(admin.ModelAdmin):
     ]
 
 admin.site.register(models.Job, JobAdmin)
-admin.site.register(models.JobLog)
-admin.site.register(models.BuildLog)
+
+class BuildLogInline(admin.TabularInline):
+    model = models.BuildLog
+    fields = ('command', 'output', 'error')
+    readonly_fields = ('command', 'output', 'error')
+
+class JobLogAdmin(admin.ModelAdmin):
+    inlines = [
+        BuildLogInline,
+    ]
+
+admin.site.register(models.JobLog, JobLogAdmin)
 

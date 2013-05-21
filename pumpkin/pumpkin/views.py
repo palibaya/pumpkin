@@ -2,11 +2,10 @@ import threading
 import time
 import subprocess
 from django.forms.models import modelformset_factory
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 
-from pumpkin import models
-from pumpkin import forms
+from pumpkin import models, forms, tasks
 
 def home(request):
 
@@ -25,6 +24,12 @@ def project_jobs(request, identifier):
         'project': project
     })
 
+def project_job_run(request, identifier, job_id):
+    job = models.Job.objects.get(id=job_id)
+    tasks.run_job.delay(job)
+    return redirect('pumpkin_project_jobs', identifier=identifier)
+
+
 def project_job_logs(request, identifier, job_id):
     job = models.Job.objects.get(id=job_id)
     logs = job.logs.order_by('-end').all()
@@ -36,18 +41,13 @@ def project_job_logs(request, identifier, job_id):
 
 def project_configure(request, identifier):
     project = models.Project.objects.get(identifier=identifier)
-    project_form = forms.ProjectForm(instance=project)
     #ProjectFormset = modelformset_factory(models.Project)
-    #if request.method == "POST":
-        #formset = ProjectFormset(request.POST, request.FILES,
-                                 #queryset=models.Project\
-                                #.objects.filter(identifier=identifier))
-        #if formset.is_valid():
-            #formset.save()
-    #else:
-        #formset = ProjectFormset(queryset=models.Project\
-                                 #.objects.filter(identifier=identifier))
-
+    if request.method == "POST":
+        project_form = forms.ProjectForm(request.POST, instance=project)
+        if project_form.is_valid():
+            project_form.save()
+    else:
+        project_form = forms.ProjectForm(instance=project)
     return render(request, 'project_configure.html', {
         'project': project,
         'project_form': project_form,

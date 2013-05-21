@@ -1,7 +1,9 @@
 # Test dependencies go here.
 -r base.txt
-coverage==3.6
-django-discover-runner==0.2.2
-mechanize==0.2.5
-wsgi_intercept==0.5.1
-BeautifulSoup==3.2.1
+coverage
+django-discover-runner
+mechanize
+wsgi_intercept
+beautifulsoup4
+selenium
+splinter

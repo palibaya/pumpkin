@@ -20,7 +20,7 @@
             <td>{{ job.last_run.begin }}</td>
             <td>{{ job.last_run.status }}</td>
             <td>{{ job.last_duration }}</td>
-            <td><a href="#"><i class="icon-play-circle"></i></a></td>
+            <td><a href="{% url 'pumpkin.views.project_job_run' identifier=project.identifier job_id=job.id %}"><i class="icon-play-circle"></i></a></td>
         </tr>
         {% endfor %}
     </tbody>

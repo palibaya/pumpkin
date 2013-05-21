@@ -178,8 +178,11 @@ DJANGO_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dynamicsettings',
+    # cerely
+    'djcelery',
+    'kombu.transport.django',
 
+    'dynamicsettings',
     # Useful template tags:
     # 'django.contrib.humanize',
     'django_admin_bootstrapped',
@@ -246,6 +249,9 @@ LOGIN_REDIRECT_URL = '/'
 WSGI_APPLICATION = 'wsgi.application'
 ########## END WSGI CONFIGURATION
 
-
-GIT_REPOSITORIES = '/home/ata/Project/pumpkins_repositories'
+########## CERELY CONFIGURATION
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'django://'
+########## END CERELY CONFIGURATION
 
