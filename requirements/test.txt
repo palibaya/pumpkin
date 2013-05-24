@@ -7,3 +7,4 @@ wsgi_intercept
 beautifulsoup4
 selenium
 splinter
+behave

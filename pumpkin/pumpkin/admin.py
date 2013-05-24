@@ -19,8 +19,8 @@ admin.site.register(models.Job, JobAdmin)
 
 class BuildLogInline(admin.TabularInline):
     model = models.BuildLog
-    fields = ('command', 'output', 'error')
-    readonly_fields = ('command', 'output', 'error')
+    fields = ('command', 'output', 'error', 'status')
+    readonly_fields = ('status',)
 
 class JobLogAdmin(admin.ModelAdmin):
     inlines = [

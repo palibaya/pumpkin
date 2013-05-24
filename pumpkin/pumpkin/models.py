@@ -292,12 +292,10 @@ class Build(BaseModel):
     sequence = models.PositiveIntegerField(default=1)
 
     def save(self):
-        last_build = self.job.get_last_build()
-        if last_build is not None:
-            self.sequence = last_build.sequence  + 1
-
-        print 'Last Build: %s' % last_build
-
+        if self.id is None:
+            last_build = self.job.get_last_build()
+            if last_build is not None:
+                self.sequence = last_build.sequence  + 1
         return super(Build, self).save()
 
     def run(self, runner, job_log, test_server):
