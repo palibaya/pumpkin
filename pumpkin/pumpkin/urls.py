@@ -14,8 +14,10 @@ urlpatterns += patterns('',
 
     # Examples:
     # url(r'^pumpkin/', include('pumpkin.foo.urls')),
+    url(r'^project/create/$', 'pumpkin.views.project_create'),
     url(r'^project/(?P<identifier>\w+)/$', 'pumpkin.views.project'),
-    url(r'^project/(?P<identifier>\w+)/configure/$', 'pumpkin.views.project_configure'),
+    url(r'^project/(?P<identifier>\w+)/configure/$',
+        'pumpkin.views.project_configure'),
     url(r'^project/(?P<identifier>\w+)/jobs/$',
         'pumpkin.views.project_jobs', name='pumpkin_project_jobs'),
     url(r'^project/(?P<identifier>\w+)/job/(?P<job_id>\d+)/run$',

@@ -178,6 +178,7 @@ DJANGO_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.webdesign',
     # cerely
     'djcelery',
     'kombu.transport.django',

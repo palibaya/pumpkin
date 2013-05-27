@@ -1,1 +1,83 @@
 /*! project specific CSS goes here. */
+
+html, body {
+    background-color: #F5F5F5;
+}
+
+h3.project-name{
+    margin: 5px 0 0 0;
+}
+
+.submenu {
+    background: none repeat scroll 0 0 #F5F5F5;
+    margin-top: 20px;
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.submenu ul.nav{
+    margin-bottom: 0;
+    border-bottom: 0;
+}
+
+
+.submenu ul.nav > .active > a{
+    border: 1px solid transparent;
+    background-color: transparent;
+    position:relative;
+    font-weight: bold;
+}
+
+.submenu ul.nav > .active > a:before{
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: transparent transparent #CCCCCC;
+    border-image: none;
+    border-style: outset outset solid;
+    border-width: 8px;
+    bottom: 0;
+    content: "";
+    height: 0;
+    left: 50%;
+    margin-left: -8px;
+    overflow: hidden;
+    position: absolute;
+    width: 0;
+}
+
+
+.submenu ul.nav > .active > a:after{
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: transparent transparent #FFFFFF;
+    border-image: none;
+    border-style: outset outset solid;
+    border-width: 8px;
+    bottom: -1px;
+    content: "";
+    height: 0;
+    left: 50%;
+    margin-left: -8px;
+    overflow: hidden;
+    position: absolute;
+    width: 0;
+}
+
+
+.project-content {
+    background-color: #ffffff;
+    padding: 20px 0 50px;
+}
+
+footer{
+    text-align: center;
+    border-top: 1px solid #CCCCCC;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    font-size: small;
+
+}

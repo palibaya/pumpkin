@@ -1,15 +1,16 @@
-django
-bpython
-django-braces
+django == 1.5.1
+bpython == 0.12
+django-braces == 1.0.0
 django-model-utils
-logutils
-South
-psycopg2
-pyyaml
-paramiko
-django-celery
+logutils == 0.3.3
+South == 0.7.6
+psycopg2 == 2.5
+PyYAML == 3.10
+paramiko == 1.10.1
+django-celery == 3.0.17
 https://github.com/sternoru/django-dynamic-settings/archive/master.zip#django-dynamic-settings
-pygments
-GitPython
-django-admin-bootstrapped
+Pygments == 1.6
+GitPython == 0.3.2.RC1
+django-admin-bootstrapped == 0.3.2
+pyparsing == 1.5.7
 

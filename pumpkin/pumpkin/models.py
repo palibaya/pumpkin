@@ -11,6 +11,8 @@ from django.contrib.auth.models import User
 import paramiko
 import pytz
 
+from pumpkin.tools import SSHClient
+
 current_tz =  pytz.timezone(settings.TIME_ZONE)
 
 class BaseModel(models.Model):
@@ -24,6 +26,8 @@ class BaseModel(models.Model):
         else:
             return '%s ID:%s' % (type(self).__name__, self.id)
 
+
+#deprecated class
 class TestServer(BaseModel):
     '''
     Model ini untuk menyimpan informasi server untuk kebutuhan testing
@@ -89,6 +93,20 @@ class TestServer(BaseModel):
         self.save()
 
 
+
+class Server(BaseModel):
+    name = models.CharField(max_length=255)
+    host = models.CharField(max_length=32)
+    port = models.PositiveIntegerField()
+    superuser_login = models.CharField(max_length=32)
+    superuser_password = models.CharField(max_length=255)
+    user_login = models.CharField(max_length=32)
+    user_password = models.CharField(max_length=255)
+    ssh_key_pub = models.TextField(blank=True)
+
+
+
+
 class Repository(BaseModel):
     name = models.CharField(max_length=255)
 
@@ -104,11 +122,16 @@ class Project(BaseModel):
                                       related_name='managered_projects')
     members = models.ManyToManyField(User,
                                      related_name='membered_projects')
+
+    server = models.ForeignKey(Server)
+
+    # deprecated properties
     test_server = models.ForeignKey(TestServer)
     git_remote_address = models.CharField(max_length=255, blank=True)
     setup_command = models.TextField(blank=True)
     setup_log = models.TextField(blank=True)
 
+    # deprecated methods
     def after_create(self):
         pass
 
@@ -162,30 +185,18 @@ class JobLog(BaseModel):
 
 class Job(BaseModel):
     name = models.CharField(max_length=255)
+    project = models.ForeignKey(Project, related_name='jobs')
+
+
+    #deprecated
     runner = models.CharField(max_length=255,
                               default='pumpkin.runners.Runner')
-    project = models.ForeignKey(Project, related_name='jobs')
     pre_job = models.ForeignKey('self', related_name='+', null=True,
                                 blank=True)
     post_job = models.ForeignKey('self', related_name='+', null=True,
                                  blank=True)
 
-    def pre_run(self):
-        if self.pre_job:
-            last_pre_job = self.pre_job.last_run()
-            if last_pre_job is None:
-                self.pre_job.run()
-            elif last_pre_job.status != 'success':
-                self.pre_job.run()
 
-        if not hasattr(self, '_runner'):
-            module_path, runner_class_str = self.runner.rsplit('.',1)
-            module = importlib.import_module(module_path)
-            runner_class = getattr(module, runner_class_str)
-            self._runner = runner_class(self)
-        self.project.test_server.connect()
-        self.project.set_params()
-        self._runner.pre_run_job()
 
 
     def run(self):
@@ -215,11 +226,6 @@ class Job(BaseModel):
         job_log.save()
         self.post_run()
 
-    def post_run(self):
-        if self.post_job:
-            self.post_job.run()
-        self._runner.post_run_job()
-        self.project.test_server.close()
 
     def get_last_build(self):
         lasts = self.builds.order_by('-sequence')
@@ -251,6 +257,32 @@ class Job(BaseModel):
     def last_duration(self):
         if self.last_run() is not None:
             return self.last_run().duration()
+
+
+    #deprecated methods
+    def pre_run(self):
+        if self.pre_job:
+            last_pre_job = self.pre_job.last_run()
+            if last_pre_job is None:
+                self.pre_job.run()
+            elif last_pre_job.status != 'success':
+                self.pre_job.run()
+
+        if not hasattr(self, '_runner'):
+            module_path, runner_class_str = self.runner.rsplit('.',1)
+            module = importlib.import_module(module_path)
+            runner_class = getattr(module, runner_class_str)
+            self._runner = runner_class(self)
+        self.project.test_server.connect()
+        self.project.set_params()
+        self._runner.pre_run_job()
+
+
+    def post_run(self):
+        if self.post_job:
+            self.post_job.run()
+        self._runner.post_run_job()
+        self.project.test_server.close()
 
 class Queue(BaseModel):
     name = models.CharField(max_length=255)

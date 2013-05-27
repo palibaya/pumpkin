@@ -18,6 +18,12 @@ def project(request, identifier):
         'project': project
     })
 
+def project_create(request):
+
+    return render(request, 'project_create.html', {
+
+    })
+
 def project_jobs(request, identifier):
     project = models.Project.objects.get(identifier=identifier)
     return render(request, 'project_jobs.html', {

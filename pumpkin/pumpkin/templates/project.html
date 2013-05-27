@@ -1,19 +1,35 @@
 {% extends "base.html" %}
-
+{% load webdesign %}
 {% block title %}Project - {{ project.name }}{% endblock %}
-
-{% block page_title %}New Template{% endblock page_title %}
 {% block content %}
-<div class="container-fluid">
-    <h2>{{ project.name }}</h2>
-    <div class="row-fluid">
-        <div class="span2">
 
-            <ul class="nav nav-list">
 
-                {% url 'pumpkin.views.project' identifier=project.identifier as url %}
+<header>
+    <div class="container">
+        <div class="row">
+            <div class="span-2">
+                <a href="{% url 'pumpkin.views.project' identifier=project.identifier %}">
+                    <img src="{{ STATIC_URL }}img/no-logo-80.jpg" class="img-circle"/>
+                </a>
+            </div>
+            <div class="span-10">
+                <a href="{% url 'pumpkin.views.project' identifier=project.identifier %}">
+                    <h3 class="project-name">{{ project.name }}</h3>
+                </a>
+                <p>{{ project.description }}</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+<div class="submenu">
+    <div class="container">
+        <ul class="nav nav-tabs">
+            {% url 'pumpkin.views.project' identifier=project.identifier as url %}
                 <li{% if request.path == url %} class="active"{% endif %}>
-                    <a href="{{ url }}">Summary</a>
+                    <a href="{{ url }}">Overview</a>
                 </li>
 
                 {% url 'pumpkin.views.project_jobs' identifier=project.identifier as url %}
@@ -21,36 +37,26 @@
                     <a href="{{ url }}">Jobs</a>
                 </li>
 
-                {% if job %}
-                {% url 'pumpkin.views.project_jobs' identifier=project.identifier as url %}
-                <li class="nav-header">Job Logs</li>
-                <li>
-                    <ul class="nav nav-list">
-                        {% for j in project.jobs.all %}
-                        {% url 'pumpkin.views.project_job_logs' identifier=project.identifier job_id=j.id as job_log_url %}
-                        <li{% if request.path == job_log_url %} class="active"{% endif %}>
-                            <a href="{{ job_log_url }}">{{ j.name }}</a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-                <li class="divider"></li>
-                {% endif %}
-
                 {% include 'project_nav_extra.html' %}
 
                 {% url 'pumpkin.views.project_configure' identifier=project.identifier as url %}
-                <li{% if request.path == url  %} class="active"{% endif %}>
+                <li class="{% if request.path == url  %}active {% endif %}pull-right">
                     <a href="{{ url }}">Configure</a>
                 </li>
-            </ul>
+        </ul>
+    </div>
+</div>
 
-        </div>
-        <div class="span10">
+<div class="project-content">
+    <div class="container">
+        <div class="tab-content">
+            <div class="tab-pane active">
             {% block content_project %}
-            Summary
+            <h4>{% lorem 4 w %}</h4>
+            {% lorem 3 p %}
             {% endblock content_project %}
-        </div><!--end.span10-->
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}
