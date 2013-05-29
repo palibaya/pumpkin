@@ -1,19 +1,20 @@
 [
 {
-    "pk": 1, 
-    "model": "pumpkin.project", 
+    "pk": 1,
+    "model": "pumpkin.project",
     "fields": {
         "managers": [
             2
-        ], 
-        "name": "Melon", 
+        ],
+        "name": "Project Pumpkin",
         "members": [
-            2, 
+            2,
             4
-        ], 
-        "test_server": 1, 
-        "identifier": "melon", 
-        "description": "Melon bla..bla.."
+        ],
+        "server": 1,
+        "identifier": "pumpkin",
+        "description": "project it self",
+        "repository": 1
     }
 }
 ]

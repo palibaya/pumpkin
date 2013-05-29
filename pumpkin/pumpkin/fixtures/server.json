@@ -1,0 +1,15 @@
+[
+{
+    "pk": 1,
+    "model": "pumpkin.server",
+    "fields": {
+        "name": "VBox Server 1",
+        "host": "127.0.0.1",
+        "port": 2222,
+        "superuser_login": "root",
+        "superuser_password": "root",
+        "user_login": "pumpkin",
+        "user_password": "pumpkin"
+    }
+}
+]

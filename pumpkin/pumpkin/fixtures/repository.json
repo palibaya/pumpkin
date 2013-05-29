@@ -1,0 +1,11 @@
+[
+{
+    "pk": 1, 
+    "model": "pumpkin.repository", 
+    "fields": {
+        "scm": 1, 
+        "name": "Pumpkin Bitbucket Repo", 
+        "address": "https://palibaya@bitbucket.org/palibaya/pumpkin.git"
+    }
+}
+]

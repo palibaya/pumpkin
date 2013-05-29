@@ -1,10 +1,14 @@
 import paramiko
 
+
 class SSHClient(object):
 
     def __init__(self, server):
         self.server = server
         self.params = {}
+        self.cmds = []
+
+    def connect(self):
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko\
                                                 .AutoAddPolicy())
@@ -12,7 +16,10 @@ class SSHClient(object):
                             port=server.port,
                             username=server.user_login,
                             password=server.user_password)
+
+    def close(self):
         self.cmds = []
+        self.client.close()
 
     def set_params(self, params):
         self.params = params
@@ -38,7 +45,4 @@ class SSHClient(object):
         self.cmds = filter(lambda x: len(x.strip()) > 0, cmd.split('\n'))
         self.set_params(params)
         return self.execute()
-
-    def close(self):
-        self.client.close()
 

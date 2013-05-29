@@ -8,15 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Build.output'
-        db.delete_column(u'pumpkin_build', 'output')
+        # Adding field 'Repository.address'
+        db.add_column(u'pumpkin_repository', 'address',
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=255),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Adding field 'Build.output'
-        db.add_column(u'pumpkin_build', 'output',
-                      self.gf('django.db.models.fields.TextField')(default=''),
-                      keep_default=False)
+        # Deleting field 'Repository.address'
+        db.delete_column(u'pumpkin_repository', 'address')
 
 
     models = {
@@ -57,11 +57,11 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'pumpkin.build': {
-            'Meta': {'ordering': "['sequence']", 'object_name': 'Build'},
+            'Meta': {'object_name': 'Build'},
             'command': ('django.db.models.fields.TextField', [], {}),
+            'command_type': ('django.db.models.fields.CharField', [], {'default': "'bash'", 'max_length': '16'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'builds'", 'to': u"orm['pumpkin.Job']"}),
-            'project': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['pumpkin.Project']"}),
             'sequence': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1'})
         },
         u'pumpkin.buildlog': {
@@ -70,28 +70,27 @@ class Migration(SchemaMigration):
             'build': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'logs'", 'to': u"orm['pumpkin.Build']"}),
             'command': ('django.db.models.fields.TextField', [], {}),
             'end': ('django.db.models.fields.DateTimeField', [], {}),
+            'error': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'job_log': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'job_logs'", 'to': u"orm['pumpkin.JobLog']"}),
-            'output': ('django.db.models.fields.TextField', [], {})
-        },
-        u'pumpkin.buildtemplate': {
-            'Meta': {'object_name': 'BuildTemplate'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'build_logs'", 'to': u"orm['pumpkin.Job']"}),
+            'job_log': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'build_logs'", 'to': u"orm['pumpkin.JobLog']"}),
+            'output': ('django.db.models.fields.TextField', [], {}),
+            'sequence': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1'}),
+            'status': ('django.db.models.fields.CharField', [], {'max_length': '16'})
         },
         u'pumpkin.job': {
             'Meta': {'object_name': 'Job'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'jobs'", 'to': u"orm['pumpkin.Project']"}),
-            'runner': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'jobs'", 'to': u"orm['pumpkin.Project']"})
         },
         u'pumpkin.joblog': {
             'Meta': {'object_name': 'JobLog'},
             'begin': ('django.db.models.fields.DateTimeField', [], {}),
-            'end': ('django.db.models.fields.DateTimeField', [], {}),
+            'end': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'logs'", 'to': u"orm['pumpkin.Job']"})
+            'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'logs'", 'to': u"orm['pumpkin.Job']"}),
+            'status': ('django.db.models.fields.CharField', [], {'max_length': '16'})
         },
         u'pumpkin.project': {
             'Meta': {'object_name': 'Project'},
@@ -101,28 +100,33 @@ class Migration(SchemaMigration):
             'managers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'managered_projects'", 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
             'members': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'membered_projects'", 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'test_server': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['pumpkin.TestServer']"})
-        },
-        u'pumpkin.queue': {
-            'Meta': {'object_name': 'Queue'},
-            'done': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': u"orm['pumpkin.Job']"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'repository': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'project'", 'unique': 'True', 'to': u"orm['pumpkin.Repository']"}),
+            'server': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['pumpkin.Server']"})
         },
         u'pumpkin.repository': {
             'Meta': {'object_name': 'Repository'},
+            'address': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'scm': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': u"orm['pumpkin.SCM']"})
+        },
+        u'pumpkin.scm': {
+            'Meta': {'object_name': 'SCM'},
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
-        u'pumpkin.testserver': {
-            'Meta': {'object_name': 'TestServer'},
-            'hostname': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+        u'pumpkin.server': {
+            'Meta': {'object_name': 'Server'},
+            'host': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'port': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'username': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+            'ssh_key_pub': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'superuser_login': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'superuser_password': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'user_login': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'user_password': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         }
     }
 

@@ -3,7 +3,9 @@
 from django.contrib import admin
 from pumpkin import models
 
-admin.site.register(models.TestServer)
+admin.site.register(models.Server)
+admin.site.register(models.SCM)
+admin.site.register(models.Repository)
 admin.site.register(models.Project)
 
 
