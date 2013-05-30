@@ -18,3 +18,4 @@ build
 *.logPumpkin.nja
 
 *.cache
+.idea

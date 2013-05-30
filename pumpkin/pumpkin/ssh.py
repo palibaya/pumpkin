@@ -41,10 +41,14 @@ class SSHClient(object):
         cmd = ' && '.join(list_cmd)
         return self.client.exec_command(cmd)
 
-    def exec_commands(self, cmd, params={}):
+    def exec_commands(self, cmd, params=None):
         '''
         all in one commands
+        :param cmd:
+        :param params:
         '''
+        if not params:
+            params = {}
         self.list_cmd = filter(lambda x: len(x.strip()) > 0,
                                cmd.split('\n'))
         self.set_params(params)
