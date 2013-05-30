@@ -120,16 +120,6 @@ class Job(BaseModel):
         job_log.end = current_tz.localize(datetime.now())
         job_log.save()
 
-
-    #def run(self):
-        #ssh_client = SSHClient(self.project.server)
-        #ssh_client.set_params(self.project.get_params())
-        #job_log = self._create_log()
-        #build_statuses = []
-        #for build in self.builds.order_by('sequence'):
-            #build_statuses.append(build.run(ssh_client, job_log))
-        #self._save_log(job_log, build_statuses)
-
     def run(self):
         job_log = self._create_log()
         build_statuses = []
@@ -249,12 +239,6 @@ class Build(BaseModel):
         ssh_client.close()
         self._save_log(build_log, output_list, error_list)
         return build_log.status
-
-    #def run(self, ssh_client, job_log):
-        #if type(ssh_client) is not SSHClient:
-            #raise TypeError("'client' wrong type")
-        #if self.command_type == 'bash':
-            #return self._run_bash(ssh_client, job_log)
 
     def get_builder_object(self, job_log):
         if not hasattr(self, '_builder_object'):
