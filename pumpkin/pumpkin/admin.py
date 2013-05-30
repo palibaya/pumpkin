@@ -7,6 +7,7 @@ admin.site.register(models.Server)
 admin.site.register(models.SCM)
 admin.site.register(models.Repository)
 admin.site.register(models.Project)
+admin.site.register(models.Builder)
 
 
 class BuildInline(admin.TabularInline):

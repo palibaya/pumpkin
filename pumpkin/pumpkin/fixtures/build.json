@@ -4,6 +4,7 @@
     "model": "pumpkin.build",
     "fields": {
         "job": 1,
+        "builder": 1,
         "command": "ls /",
         "sequence": 1
     }
@@ -13,6 +14,7 @@
     "model": "pumpkin.build",
     "fields": {
         "job": 1,
+        "builder": 1,
         "command": "ls /usr",
         "sequence": 2
     }
@@ -22,8 +24,9 @@
     "model": "pumpkin.build",
     "fields": {
         "job": 1,
+        "builder": 1,
         "command": "blah",
-        "sequence": 4
+        "sequence": 3
     }
 }
 ]

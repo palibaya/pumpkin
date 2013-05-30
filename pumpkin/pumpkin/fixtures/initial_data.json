@@ -14,5 +14,13 @@
         "code": "SVN",
         "name": "Subversion"
     }
+},
+{
+    "pk": 1,
+    "model": "pumpkin.builder",
+    "fields": {
+        "name": "Bash",
+        "class_name": "pumpkin.builders.BashBuilder"
+    }
 }
 ]

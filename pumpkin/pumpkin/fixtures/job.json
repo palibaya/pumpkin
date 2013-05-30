@@ -3,7 +3,6 @@
     "pk": 1,
     "model": "pumpkin.job",
     "fields": {
-        "runner": "pumpkin.runners.Runner",
         "project": 1,
         "name": "Test Server ls"
     }

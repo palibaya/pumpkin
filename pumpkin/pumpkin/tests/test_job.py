@@ -2,8 +2,8 @@ from django.test import TestCase
 from pumpkin.models import Job
 
 class JobTestCase(TestCase):
-    fixtures = ['auth.json','testserver.json', 'project.json',
-                'job.json', 'build.json']
+    fixtures = ['auth.json','server.json', 'repository.json',
+                'project.json', 'job.json', 'build.json']
 
     def test_run(self):
         job = Job.objects.get(id=1)
