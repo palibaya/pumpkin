@@ -1,9 +1,4 @@
-import threading
-import time
-import subprocess
-from django.forms.models import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.decorators import login_required
 
 from pumpkin import models, forms, tasks
 
@@ -13,8 +8,13 @@ def home(request):
 
 
 def project(request, identifier):
+    """
+    :param request:
+    :param identifier:
+    :return:
+    """
     project = models.Project.objects.get(identifier=identifier)
-    return render(request, 'project.html', {
+    return render(request, 'project_home.html', {
         'project': project
     })
 
@@ -27,7 +27,8 @@ def project_create(request):
 def project_jobs(request, identifier):
     project = models.Project.objects.get(identifier=identifier)
     return render(request, 'project_jobs.html', {
-        'project': project
+        'project': project,
+        'jobs': project.jobs.all(),
     })
 
 def project_job_run(request, identifier, job_id):

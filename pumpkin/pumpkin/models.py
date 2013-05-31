@@ -46,9 +46,9 @@ class Repository(BaseModel):
 
 
 class Project(BaseModel):
-    '''
+    """
     Model ini untuk menampung project yang akan dikelola
-    '''
+    """
     name = models.CharField(max_length=255)
     identifier = models.SlugField()
     description = models.TextField(blank=True)
@@ -63,13 +63,15 @@ class Project(BaseModel):
 
 
     def get_params(self):
-        return {
-            '%s_REPOSITORY_ADDRESS' % (self.repository.scm.code): \
+        params = {
+            '%s_REPOSITORY_ADDRESS' % self.repository.scm.code: \
                     self.repository.address,
             'PROJECT_ID': '%s' % self.identifier,
             'PROJECT_WORKSPACE': self.get_workspace_path(),
         }
-
+        #adds = dict([(p.key, p.value) for p in self.params.all()])
+        #params.update(adds)
+        return params
 
     def get_absolute_url(self):
         return reverse('pumpkin.views.project',
@@ -81,6 +83,12 @@ class Project(BaseModel):
 class ProjectBranch(BaseModel):
     name = models.CharField(max_length=255)
     project = models.ForeignKey(Project)
+
+
+class ProjectParam(BaseModel):
+    key = models.CharField(max_length=255)
+    value = models.CharField(max_length=255)
+    project = models.ForeignKey(Project, related_name='params')
 
 
 class JobLog(BaseModel):
@@ -193,10 +201,10 @@ class BuildLog(BaseModel):
 
 
 class Build(BaseModel):
-    '''
+    """
     Model ini untuk menampung perintah yang akan dilakukan terhadap
     project yang dikelola
-    '''
+    """
 
     COMMAND_TYPE_CHOICES = (
         ('bash', 'BASH'),
@@ -214,7 +222,7 @@ class Build(BaseModel):
         if self.id is None:
             last_build = self.job.get_last_build()
             if last_build is not None:
-                self.sequence = last_build.sequence  + 1
+                self.sequence = last_build.sequence + 1
         return super(Build, self).save()
 
 

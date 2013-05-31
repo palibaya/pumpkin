@@ -1,0 +1,16 @@
+{% extends "project.html" %}
+{% load webdesign %}
+
+{% block title %}Project - {{ project.name }} - Configure{% endblock %}
+
+
+{% block project_nav_home %}<li class="active"><a href="{% url 'pumpkin.views.project' identifier=project.identifier %}">Overview</a></li>{% endblock %}
+
+
+{% block project_content %}
+
+<h4>{% lorem 4 w %}</h4>
+{% lorem 3 p %}
+
+{% endblock project_content %}
+

@@ -2,28 +2,57 @@
 
 {% block title %}Project - {{ project.name }} - Jobs {% endblock %}
 
-{% block content_project %}
-<table class="table table-border">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Last Running</th>
-            <th>Last Status</th>
-            <th>Last Duration</th>
-            <th> </th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for job in project.jobs.all %}
-        <tr>
-            <td><a href="{% url 'pumpkin.views.project_job_logs' identifier=project.identifier job_id=job.id %}">{{ job.name }}</a></td>
-            <td>{{ job.last_run.begin }}</td>
-            <td>{{ job.last_run.status }}</td>
-            <td>{{ job.last_duration }}</td>
-            <td><a href="{% url 'pumpkin.views.project_job_run' identifier=project.identifier job_id=job.id %}"><i class="icon-play-circle"></i></a></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock content_project %}
+{% block project_nav_jobs%}<li class="active"><a href="{% url 'pumpkin.views.project_jobs' identifier=project.identifier %}">Jobs</a></li>{% endblock %}
+
+{% block project_content %}
+<div class="row">
+    <div class="span2">
+        {% block job_nav %}
+        <ul class="nav nav-list">
+            <li{% if not logs %} class="active"{% endif %}>
+                <a href="{% url 'pumpkin.views.project_jobs' identifier=project.identifier %}">All</a>
+            </li>
+            <li class="divider"></li>
+            <li class="nav-header">Detail Job</li>
+            {% for j in project.jobs.all %}
+            <li{% if job and job.id == j.id %} class="active"{% endif %}>
+                <a href="{% url 'pumpkin.views.project_job_logs' identifier=project.identifier job_id=j.id %}">{{ j.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endblock job_nav %}
+    </div>
+    <div class="span10">
+        {% block job_content %}
+        <div class="row">
+            <div class="span10">
+                <a href="/" class="btn pull-right">Create Job</a>
+            </div>
+        </div>
+        <table class="table table-border span-8">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Last Running</th>
+                    <th>Last Status</th>
+                    <th>Last Duration</th>
+                    <th> </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td><a href="{% url 'pumpkin.views.project_job_logs' identifier=project.identifier job_id=job.id %}">{{ job.name }}</a></td>
+                    <td>{{ job.last_run.begin }}</td>
+                    <td>{{ job.last_run.status }}</td>
+                    <td>{{ job.last_duration }}</td>
+                    <td><a href="{% url 'pumpkin.views.project_job_run' identifier=project.identifier job_id=job.id %}"><i class="icon-play-circle"></i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endblock job_content %}
+    </div>
+</div>
+{% endblock project_content %}
 

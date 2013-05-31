@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load webdesign %}
 {% block title %}Project - {{ project.name }}{% endblock %}
 {% block content %}
 
@@ -23,40 +22,22 @@
 </header>
 
 
-
 <div class="submenu">
     <div class="container">
+        {% block project_nav %}
         <ul class="nav nav-tabs">
-            {% url 'pumpkin.views.project' identifier=project.identifier as url %}
-                <li{% if request.path == url %} class="active"{% endif %}>
-                    <a href="{{ url }}">Overview</a>
-                </li>
-
-                {% url 'pumpkin.views.project_jobs' identifier=project.identifier as url %}
-                <li{% if request.path == url %} class="active"{% endif %}>
-                    <a href="{{ url }}">Jobs</a>
-                </li>
-
-                {% include 'project_nav_extra.html' %}
-
-                {% url 'pumpkin.views.project_configure' identifier=project.identifier as url %}
-                <li class="{% if request.path == url  %}active {% endif %}pull-right">
-                    <a href="{{ url }}">Configure</a>
-                </li>
+            {% block project_nav_home %}<li><a href="{% url 'pumpkin.views.project' identifier=project.identifier %}">Overview</a></li>{% endblock %}
+            {% block project_nav_jobs %}<li><a href="{% url 'pumpkin.views.project_jobs' identifier=project.identifier %}">Jobs</a></li>{% endblock %}
+            {% block project_nav_configure %}<li class="pull-right"><a href="{% url 'pumpkin.views.project_configure' identifier=project.identifier %}">Configure</a></li>{% endblock %}
         </ul>
+        {% endblock project_nav %}
     </div>
 </div>
 
 <div class="project-content">
     <div class="container">
-        <div class="tab-content">
-            <div class="tab-pane active">
-            {% block content_project %}
-            <h4>{% lorem 4 w %}</h4>
-            {% lorem 3 p %}
-            {% endblock content_project %}
-            </div>
-        </div>
+        {% block project_content %}
+        {% endblock project_content %}
     </div>
 </div>
 {% endblock content %}

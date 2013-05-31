@@ -2,25 +2,45 @@
 
 {% block title %}Project - {{ project.name }} - Configure{% endblock %}
 
-{% block content_project %}
-<form class="form-horizontal" method="post">
-    {% csrf_token %}
-    <legend>{{ project.name }} - Configure</legend>
-    {% for field in project_form %}
-    <div class="control-group">
-        <label class="control-label" for="{{ field.name }}">{{ field.label }}</label>
-        <div class="controls">
-            {{ field }}
-        </div>
-    </div>
-    {% endfor %}
-    <div class="control-group">
-        <div class="controls">
-            <button type="submit" class="btn btn-primary">Save</button>
-        </div>
-    </div>
-  </div>
-</form>
+{% block project_nav_configure%}<li class="active pull-right"><a href="{% url 'pumpkin.views.project_configure' identifier=project.identifier %}">Configure</a></li>{% endblock %}
 
-{% endblock content_project %}
+{% block project_content %}
+<div class="row">
+    <div class="span2">
+        {% block config_nav %}
+        <ul class="nav nav-list">
+            <li class="active"><a href="{% url 'pumpkin.views.project_configure' identifier=project.identifier %}">Project Detail</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Job Settings</li>
+            {% for j in project.jobs.all %}
+            <li{% if job and job.id == j.id %} class="active"{% endif %}>
+                <a href="{% url 'pumpkin.views.project_job_logs' identifier=project.identifier job_id=j.id %}">{{ j.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endblock config_nav %}
+    </div>
+    <div class="span10">
+        {% block config_content %}
+        <form class="form-horizontal" method="post">
+            {% csrf_token %}
+            <legend>{{ project.name }} - Configure</legend>
+            {% for field in project_form %}
+            <div class="control-group">
+                <label class="control-label" for="{{ field.name }}">{{ field.label }}</label>
+                <div class="controls">
+                    {{ field }}
+                </div>
+            </div>
+            {% endfor %}
+            <div class="control-group">
+                <div class="controls">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+        {% endblock config_content %}
+    </div>
+</div>
+{% endblock project_content %}
 

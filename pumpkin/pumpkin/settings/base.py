@@ -182,7 +182,6 @@ DJANGO_APPS = (
     # cerely
     'djcelery',
     'kombu.transport.django',
-
     'dynamicsettings',
     # Useful template tags:
     # 'django.contrib.humanize',
@@ -191,6 +190,8 @@ DJANGO_APPS = (
     'django.contrib.admin',
     # 'django.contrib.admindocs',
     #'django_git',
+    'pumpkin_bdd',
+
 )
 
 #REPOS_ROOT = '/home/palibaya/Project/repos'

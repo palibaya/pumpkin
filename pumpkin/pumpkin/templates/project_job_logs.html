@@ -1,8 +1,8 @@
-{% extends "project.html" %}
+{% extends "project_jobs.html" %}
 
 {% block title %}Project - {{ project.name }} - Jobs {% endblock %}
 
-{% block content_project %}
+{% block job_content%}
 <table class="table table-border">
     <thead>
         <tr>
@@ -21,5 +21,5 @@
         {% endfor %}
     </tbody>
 </table>
-{% endblock content_project %}
+{% endblock job_content %}
 
