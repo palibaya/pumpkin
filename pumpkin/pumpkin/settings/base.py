@@ -190,7 +190,10 @@ DJANGO_APPS = (
     # Admin panel and documentation:
     'django.contrib.admin',
     # 'django.contrib.admindocs',
+    #'django_git',
 )
+
+#REPOS_ROOT = '/home/palibaya/Project/repos'
 
 THIRD_PARTY_APPS = (
     # Database migration helpers:

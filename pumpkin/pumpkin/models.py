@@ -78,6 +78,10 @@ class Project(BaseModel):
     def get_workspace_path(self):
         return '$HOME/%s' % self.identifier.replace('-','_')
 
+class ProjectBranch(BaseModel):
+    name = models.CharField(max_length=255)
+    project = models.ForeignKey(Project)
+
 
 class JobLog(BaseModel):
     STATUS_CHOICES = (
@@ -89,7 +93,7 @@ class JobLog(BaseModel):
     begin = models.DateTimeField()
     end = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES)
-
+    branch = models.ForeignKey(ProjectBranch, null=True, blank=True)
 
     def duration(self):
         return self.end - self.begin
@@ -102,9 +106,13 @@ class Job(BaseModel):
     name = models.CharField(max_length=255)
     project = models.ForeignKey(Project, related_name='jobs')
 
-    def _create_log(self):
+    def _create_log(self, branch_name):
         job_log = JobLog()
         job_log.job = self
+        if branch_name is not None:
+            job_log.branch = ProjectBranch.objects\
+                                          .get(project=self.project,
+                                               name=branch_name)
         job_log.begin = current_tz.localize(datetime.now())
         job_log.save()
         return job_log
@@ -120,8 +128,8 @@ class Job(BaseModel):
         job_log.end = current_tz.localize(datetime.now())
         job_log.save()
 
-    def run(self):
-        job_log = self._create_log()
+    def run(self, branch_name=None):
+        job_log = self._create_log(branch_name)
         build_statuses = []
         for build in self.builds.order_by('sequence'):
             build_statuses.append(build.run(job_log))
@@ -181,6 +189,7 @@ class BuildLog(BaseModel):
     begin = models.DateTimeField()
     end = models.DateTimeField()
     status = models.CharField(max_length=16, choices=STATUS_CHOICES)
+    branch = models.ForeignKey(ProjectBranch, null=True, blank=True)
 
 
 class Build(BaseModel):
