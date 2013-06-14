@@ -32,13 +32,14 @@ class SSHClient(object):
         self.params.update(kwargs)
 
     def add_command(self, cmd):
-        cmd = cmd.replace('\r','\n')
+        #cmd = cmd.replace('\r','\n')
         cmds = filter(lambda x: len(x.strip()) > 0, cmd.split('\n'))
         self.list_cmd += cmds
 
     def execute(self):
         list_cmd = self.list_param + self.list_cmd
-        cmd = ' && '.join(list_cmd)
+        #cmd = ' && '.join(list_cmd)
+        cmd = '\n'.join(list_cmd)
         return self.client.exec_command(cmd)
 
     def exec_commands(self, cmd, params=None):

@@ -69,8 +69,8 @@ class Project(BaseModel):
             'PROJECT_ID': '%s' % self.identifier,
             'PROJECT_WORKSPACE': self.get_workspace_path(),
         }
-        #adds = dict([(p.key, p.value) for p in self.params.all()])
-        #params.update(adds)
+        #extra = dict([(p.key, p.value) for p in self.params.all()])
+        #params.update(extra)
         return params
 
     def get_absolute_url(self):
@@ -89,6 +89,10 @@ class ProjectParam(BaseModel):
     key = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
     project = models.ForeignKey(Project, related_name='params')
+
+
+class JobTemplate(BaseModel):
+    name = models.CharField(max_length=255)
 
 
 class JobLog(BaseModel):
@@ -114,13 +118,10 @@ class Job(BaseModel):
     name = models.CharField(max_length=255)
     project = models.ForeignKey(Project, related_name='jobs')
 
-    def _create_log(self, branch_name):
+    def _create_log(self, branch):
         job_log = JobLog()
         job_log.job = self
-        if branch_name is not None:
-            job_log.branch = ProjectBranch.objects\
-                                          .get(project=self.project,
-                                               name=branch_name)
+        job_log.branch = branch
         job_log.begin = current_tz.localize(datetime.now())
         job_log.save()
         return job_log
@@ -136,8 +137,8 @@ class Job(BaseModel):
         job_log.end = current_tz.localize(datetime.now())
         job_log.save()
 
-    def run(self, branch_name=None):
-        job_log = self._create_log(branch_name)
+    def run(self, branch=None):
+        job_log = self._create_log(branch)
         build_statuses = []
         for build in self.builds.order_by('sequence'):
             build_statuses.append(build.run(job_log))
@@ -223,6 +224,9 @@ class Build(BaseModel):
             last_build = self.job.get_last_build()
             if last_build is not None:
                 self.sequence = last_build.sequence + 1
+
+        self.command = self.command.replace('\r\n', '\n')
+        self.command = self.command.replace('\r', '\n')
         return super(Build, self).save()
 
 
@@ -268,8 +272,6 @@ class Build(BaseModel):
 
     def run(self, job_log):
         builder = self.get_builder_object(job_log)
-        builder.run()
+        builder.build_run()
         return builder.get_log().status
-
-
 

@@ -11,3 +11,4 @@ def project_setup(project):
 @task
 def run_job(job):
     job.run()
+    return job.last_run()

@@ -77,8 +77,9 @@ class Example(BaseModel):
     table = models.TextField(blank=True)
     filename = models.CharField(max_length=255)
     line = models.IntegerField(blank=True, null=True)
-    outline = models.ForeignKey(ScenarioOutline,
-                                related_name='examples')
+    scenario_outline = models.ForeignKey(ScenarioOutline,
+                                         related_name='examples',
+                                         blank=True, null=True)
 
 
 class Step(BaseModel):
@@ -97,6 +98,9 @@ class Step(BaseModel):
                                    null=True, blank=True)
     scenario = models.ForeignKey(Scenario, related_name='steps',
                                  null=True, blank=True)
+    scenario_outline = models.ForeignKey(ScenarioOutline,
+                                         related_name='steps',
+                                         null=True, blank=True)
 
 
 

@@ -24,6 +24,11 @@ class BaseBuilder(object):
     def pre_run(self):
         pass
 
+    def build_run(self):
+        self.pre_run()
+        self.run()
+        self.post_run()
+
     def post_run(self):
         pass
 
@@ -62,7 +67,6 @@ class BashBuilder(BaseBuilder):
         return self.build_log
 
     def run(self):
-        self.pre_run()
         build_log = self._create_log()
         #initial ssh
         self.client.set_params(self.build.job.project.get_params())
@@ -77,6 +81,13 @@ class BashBuilder(BaseBuilder):
         #save log
         self._save_log(build_log, output_list, error_list)
         self.build_log = build_log
-        self.post_run()
 
 
+class PythonFunctionBuilder(object):
+
+    def get_log(self):
+        raise Exception("Unimplentation methods")
+
+    def run(self):
+        ''' implemented method'''
+        pass

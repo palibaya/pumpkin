@@ -48,8 +48,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         #'NAME': normpath(join(DJANGO_ROOT, 'default.db')),
         'NAME': 'pumpkin',
-        'USER': 'ata',
-        'PASSWORD': 'rahasia',
+        'USER': 'pumpkin',
+        'PASSWORD': 'pumpkin',
         'HOST': '',
         'PORT': '',
     }
@@ -179,10 +179,6 @@ DJANGO_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.webdesign',
-    # cerely
-    'djcelery',
-    'kombu.transport.django',
-    'dynamicsettings',
     # Useful template tags:
     # 'django.contrib.humanize',
     'django_admin_bootstrapped',
@@ -190,7 +186,7 @@ DJANGO_APPS = (
     'django.contrib.admin',
     # 'django.contrib.admindocs',
     #'django_git',
-    'pumpkin_bdd',
+
 
 )
 
@@ -198,12 +194,18 @@ DJANGO_APPS = (
 
 THIRD_PARTY_APPS = (
     # Database migration helpers:
+    # cerely
+    'djcelery',
+    'kombu.transport.django',
     'south',
+    #'dynamicsettings',
 )
+
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'pumpkin',
+    'pumpkin_bdd',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -254,9 +256,18 @@ LOGIN_REDIRECT_URL = '/'
 WSGI_APPLICATION = 'wsgi.application'
 ########## END WSGI CONFIGURATION
 
+
+########## SOUTH CONFIGURATION
+#SOUTH_TESTS_MIGRATE = False
+########## END SOUTH CONFIGURATION
+
+
+
 ########## CERELY CONFIGURATION
 import djcelery
 djcelery.setup_loader()
 BROKER_URL = 'django://'
 ########## END CERELY CONFIGURATION
+
+
 

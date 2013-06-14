@@ -34,6 +34,7 @@ class Migration(SchemaMigration):
         db.create_table(u'pumpkin_repository', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('address', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('scm', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['pumpkin.SCM'])),
         ))
         db.send_create_signal(u'pumpkin', ['Repository'])
@@ -65,6 +66,30 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(u'pumpkin_project_members', ['project_id', 'user_id'])
 
+        # Adding model 'ProjectBranch'
+        db.create_table(u'pumpkin_projectbranch', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('project', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['pumpkin.Project'])),
+        ))
+        db.send_create_signal(u'pumpkin', ['ProjectBranch'])
+
+        # Adding model 'ProjectParam'
+        db.create_table(u'pumpkin_projectparam', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('key', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('value', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('project', self.gf('django.db.models.fields.related.ForeignKey')(related_name='params', to=orm['pumpkin.Project'])),
+        ))
+        db.send_create_signal(u'pumpkin', ['ProjectParam'])
+
+        # Adding model 'JobTemplate'
+        db.create_table(u'pumpkin_jobtemplate', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+        ))
+        db.send_create_signal(u'pumpkin', ['JobTemplate'])
+
         # Adding model 'JobLog'
         db.create_table(u'pumpkin_joblog', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -72,6 +97,7 @@ class Migration(SchemaMigration):
             ('begin', self.gf('django.db.models.fields.DateTimeField')()),
             ('end', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('status', self.gf('django.db.models.fields.CharField')(max_length=16)),
+            ('branch', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['pumpkin.ProjectBranch'], null=True, blank=True)),
         ))
         db.send_create_signal(u'pumpkin', ['JobLog'])
 
@@ -83,12 +109,20 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'pumpkin', ['Job'])
 
+        # Adding model 'Builder'
+        db.create_table(u'pumpkin_builder', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('class_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+        ))
+        db.send_create_signal(u'pumpkin', ['Builder'])
+
         # Adding model 'BuildLog'
         db.create_table(u'pumpkin_buildlog', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('build', self.gf('django.db.models.fields.related.ForeignKey')(related_name='logs', to=orm['pumpkin.Build'])),
             ('job', self.gf('django.db.models.fields.related.ForeignKey')(related_name='build_logs', to=orm['pumpkin.Job'])),
-            ('job_log', self.gf('django.db.models.fields.related.ForeignKey')(related_name='build_logs', to=orm['pumpkin.JobLog'])),
+            ('job_log', self.gf('django.db.models.fields.related.ForeignKey')(related_name='build_logs', null=True, to=orm['pumpkin.JobLog'])),
             ('command', self.gf('django.db.models.fields.TextField')()),
             ('output', self.gf('django.db.models.fields.TextField')()),
             ('error', self.gf('django.db.models.fields.TextField')()),
@@ -96,6 +130,7 @@ class Migration(SchemaMigration):
             ('begin', self.gf('django.db.models.fields.DateTimeField')()),
             ('end', self.gf('django.db.models.fields.DateTimeField')()),
             ('status', self.gf('django.db.models.fields.CharField')(max_length=16)),
+            ('branch', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['pumpkin.ProjectBranch'], null=True, blank=True)),
         ))
         db.send_create_signal(u'pumpkin', ['BuildLog'])
 
@@ -103,7 +138,7 @@ class Migration(SchemaMigration):
         db.create_table(u'pumpkin_build', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('job', self.gf('django.db.models.fields.related.ForeignKey')(related_name='builds', to=orm['pumpkin.Job'])),
-            ('command_type', self.gf('django.db.models.fields.CharField')(default='bash', max_length=16)),
+            ('builder', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['pumpkin.Builder'])),
             ('command', self.gf('django.db.models.fields.TextField')()),
             ('sequence', self.gf('django.db.models.fields.PositiveIntegerField')(default=1)),
         ))
@@ -129,11 +164,23 @@ class Migration(SchemaMigration):
         # Removing M2M table for field members on 'Project'
         db.delete_table('pumpkin_project_members')
 
+        # Deleting model 'ProjectBranch'
+        db.delete_table(u'pumpkin_projectbranch')
+
+        # Deleting model 'ProjectParam'
+        db.delete_table(u'pumpkin_projectparam')
+
+        # Deleting model 'JobTemplate'
+        db.delete_table(u'pumpkin_jobtemplate')
+
         # Deleting model 'JobLog'
         db.delete_table(u'pumpkin_joblog')
 
         # Deleting model 'Job'
         db.delete_table(u'pumpkin_job')
+
+        # Deleting model 'Builder'
+        db.delete_table(u'pumpkin_builder')
 
         # Deleting model 'BuildLog'
         db.delete_table(u'pumpkin_buildlog')
@@ -181,22 +228,29 @@ class Migration(SchemaMigration):
         },
         u'pumpkin.build': {
             'Meta': {'object_name': 'Build'},
+            'builder': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': u"orm['pumpkin.Builder']"}),
             'command': ('django.db.models.fields.TextField', [], {}),
-            'command_type': ('django.db.models.fields.CharField', [], {'default': "'bash'", 'max_length': '16'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'builds'", 'to': u"orm['pumpkin.Job']"}),
             'sequence': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1'})
         },
+        u'pumpkin.builder': {
+            'Meta': {'object_name': 'Builder'},
+            'class_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+        },
         u'pumpkin.buildlog': {
             'Meta': {'object_name': 'BuildLog'},
             'begin': ('django.db.models.fields.DateTimeField', [], {}),
+            'branch': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['pumpkin.ProjectBranch']", 'null': 'True', 'blank': 'True'}),
             'build': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'logs'", 'to': u"orm['pumpkin.Build']"}),
             'command': ('django.db.models.fields.TextField', [], {}),
             'end': ('django.db.models.fields.DateTimeField', [], {}),
             'error': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'build_logs'", 'to': u"orm['pumpkin.Job']"}),
-            'job_log': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'build_logs'", 'to': u"orm['pumpkin.JobLog']"}),
+            'job_log': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'build_logs'", 'null': 'True', 'to': u"orm['pumpkin.JobLog']"}),
             'output': ('django.db.models.fields.TextField', [], {}),
             'sequence': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1'}),
             'status': ('django.db.models.fields.CharField', [], {'max_length': '16'})
@@ -210,10 +264,16 @@ class Migration(SchemaMigration):
         u'pumpkin.joblog': {
             'Meta': {'object_name': 'JobLog'},
             'begin': ('django.db.models.fields.DateTimeField', [], {}),
+            'branch': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['pumpkin.ProjectBranch']", 'null': 'True', 'blank': 'True'}),
             'end': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'logs'", 'to': u"orm['pumpkin.Job']"}),
             'status': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+        },
+        u'pumpkin.jobtemplate': {
+            'Meta': {'object_name': 'JobTemplate'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         u'pumpkin.project': {
             'Meta': {'object_name': 'Project'},
@@ -226,8 +286,22 @@ class Migration(SchemaMigration):
             'repository': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'project'", 'unique': 'True', 'to': u"orm['pumpkin.Repository']"}),
             'server': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['pumpkin.Server']"})
         },
+        u'pumpkin.projectbranch': {
+            'Meta': {'object_name': 'ProjectBranch'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'project': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['pumpkin.Project']"})
+        },
+        u'pumpkin.projectparam': {
+            'Meta': {'object_name': 'ProjectParam'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'params'", 'to': u"orm['pumpkin.Project']"}),
+            'value': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+        },
         u'pumpkin.repository': {
             'Meta': {'object_name': 'Repository'},
+            'address': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'scm': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': u"orm['pumpkin.SCM']"})
