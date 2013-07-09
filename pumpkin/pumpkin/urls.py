@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
-
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+from pumpkin.wizards import NEW_PROJECT_FORMS, NewProjectWizard
+
 admin.autodiscover()
 
 urlpatterns = patterns('pumpkin.views',
@@ -14,15 +14,17 @@ urlpatterns += patterns('',
 
     # Examples:
     # url(r'^pumpkin/', include('pumpkin.foo.urls')),
-    url(r'^project/create/$', 'pumpkin.views.project_create'),
-    url(r'^project/(?P<identifier>\w+)/$', 'pumpkin.views.project'),
-    url(r'^project/(?P<identifier>\w+)/configure/$',
+    url(r'^project/create/$',
+        NewProjectWizard.as_view(NEW_PROJECT_FORMS)),
+    url(r'^project/(?P<identifier>\w+)$', 'pumpkin.views.project'),
+    url(r'^project/(?P<identifier>\w+)/configure$',
         'pumpkin.views.project_configure'),
 
-    url(r'^project/(?P<identifier>\w+)/jobs/$',
+    url(r'^project/(?P<identifier>\w+)/jobs$',
         'pumpkin.views.project_jobs', name='pumpkin_project_jobs'),
-    url(r'^project/(?P<identifier>\w+)/jobs/$',
-        'pumpkin.views.project_jobs', name='pumpkin_project_jobs'),
+
+    url(r'^project/(?P<identifier>\w+)/job/create$',
+        'pumpkin.views.project_job_create', name='pumpkin_project_job_create'),
 
     url(r'^project/(?P<identifier>\w+)/job/(?P<job_id>\d+)/run$',
         'pumpkin.views.project_job_run', name='pumpkin_project_job_run'),

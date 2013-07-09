@@ -3,7 +3,7 @@
     "pk": 1,
     "model": "pumpkin.server",
     "fields": {
-        "name": "VBox Server 1",
+        "name": "Project Pumpkin Server",
         "host": "127.0.0.1",
         "port": 2222,
         "superuser_login": "root",

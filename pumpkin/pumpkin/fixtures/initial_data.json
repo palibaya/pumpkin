@@ -8,19 +8,19 @@
     }
 },
 {
-    "pk": 2,
-    "model": "pumpkin.scm",
-    "fields": {
-        "code": "SVN",
-        "name": "Subversion"
-    }
-},
-{
     "pk": 1,
     "model": "pumpkin.builder",
     "fields": {
-        "name": "Bash",
+        "name": "Bash Shell",
         "class_name": "pumpkin.builders.BashBuilder"
+    }
+},
+{
+    "pk": 2,
+    "model": "pumpkin.builder",
+    "fields": {
+        "name": "Python Shell",
+        "class_name": "pumpkin.builders.PythonBuilder"
     }
 }
 ]

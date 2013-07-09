@@ -5,7 +5,7 @@
     "fields": {
         "job": 1,
         "builder": 1,
-        "command": "ls /",
+        "content": "ls /",
         "sequence": 1
     }
 },
@@ -15,7 +15,7 @@
     "fields": {
         "job": 1,
         "builder": 1,
-        "command": "ls /usr",
+        "content": "ls /usr",
         "sequence": 2
     }
 },
@@ -25,7 +25,7 @@
     "fields": {
         "job": 1,
         "builder": 1,
-        "command": "blah",
+        "content": "blah",
         "sequence": 3
     }
 }

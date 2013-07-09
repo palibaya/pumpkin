@@ -185,7 +185,6 @@ DJANGO_APPS = (
     # Admin panel and documentation:
     'django.contrib.admin',
     # 'django.contrib.admindocs',
-    #'django_git',
 
 
 )
@@ -196,16 +195,17 @@ THIRD_PARTY_APPS = (
     # Database migration helpers:
     # cerely
     'djcelery',
-    'kombu.transport.django',
+    #'kombu.transport.django',
     'south',
     #'dynamicsettings',
+    'widget_tweaks',
 )
 
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'pumpkin',
-    'pumpkin_bdd',
+    #'pumpkin_bdd',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -266,7 +266,8 @@ WSGI_APPLICATION = 'wsgi.application'
 ########## CERELY CONFIGURATION
 import djcelery
 djcelery.setup_loader()
-BROKER_URL = 'django://'
+#BROKER_URL = 'django://'
+BROKER_URL = 'amqp://guest:guest@localhost:5672/'
 ########## END CERELY CONFIGURATION
 
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-import importlib
+import pytz
 
 from django.conf import settings
 from django.db import models
@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.loading import get_model
 from django.contrib.auth.models import User
 
-import pytz
+from pumpkin.tools import get_obj
 
 current_tz =  pytz.timezone(settings.TIME_ZONE)
 
@@ -25,12 +25,16 @@ class BaseModel(models.Model):
 
 class Server(BaseModel):
     name = models.CharField(max_length=255)
-    host = models.CharField(max_length=32)
-    port = models.PositiveIntegerField()
-    superuser_login = models.CharField(max_length=32)
-    superuser_password = models.CharField(max_length=255)
-    user_login = models.CharField(max_length=32)
-    user_password = models.CharField(max_length=255)
+    host = models.CharField(max_length=32, verbose_name='Host Address')
+    port = models.PositiveIntegerField(verbose_name='SSH Port')
+    superuser_login = models.CharField(max_length=32,
+                                       verbose_name='Root')
+    superuser_password = models.CharField(max_length=255,
+                                          verbose_name='Root Password')
+    user_login = models.CharField(max_length=32,
+                                  verbose_name='User Login')
+    user_password = models.CharField(max_length=255,
+                                     verbose_name='User Password')
     ssh_key_pub = models.TextField(blank=True, null=True)
 
 
@@ -41,25 +45,19 @@ class SCM(BaseModel):
 
 class Repository(BaseModel):
     name = models.CharField(max_length=255)
-    address = models.CharField(max_length=255)
-    scm = models.ForeignKey(SCM, related_name='+')
+    address = models.CharField(max_length=255,
+                               verbose_name='Repository Address')
+    scm = models.ForeignKey(SCM, related_name='+', default=1,
+                            verbose_name='Repository SCM')
 
 
-class Project(BaseModel):
+class ProjectBase(BaseModel):
     """
     Model ini untuk menampung project yang akan dikelola
     """
-    name = models.CharField(max_length=255)
-    identifier = models.SlugField()
+    name = models.CharField(max_length=255, unique=True)
+    identifier = models.SlugField(unique=True)
     description = models.TextField(blank=True)
-    managers = models.ManyToManyField(User,
-                                      related_name='managered_projects')
-    members = models.ManyToManyField(User,
-                                     related_name='membered_projects')
-
-    server = models.ForeignKey(Server)
-    repository = models.OneToOneField(Repository,
-                                      related_name='project')
 
 
     def get_params(self):
@@ -80,6 +78,24 @@ class Project(BaseModel):
     def get_workspace_path(self):
         return '$HOME/%s' % self.identifier.replace('-','_')
 
+    class Meta:
+        abstract = True
+
+
+class Project(ProjectBase):
+    managers = models.ManyToManyField(User,
+                                      related_name='managered_projects')
+    members = models.ManyToManyField(User, null=True, blank=True,
+                                     related_name='membered_projects')
+
+    server = models.OneToOneField(Server)
+    repository = models.OneToOneField(Repository,
+                                      related_name='project')
+
+class ProjectTemplate(ProjectBase):
+    pass
+
+
 class ProjectBranch(BaseModel):
     name = models.CharField(max_length=255)
     project = models.ForeignKey(Project)
@@ -91,8 +107,9 @@ class ProjectParam(BaseModel):
     project = models.ForeignKey(Project, related_name='params')
 
 
-class JobTemplate(BaseModel):
+class JobTrigger(BaseModel):
     name = models.CharField(max_length=255)
+    class_name = models.CharField(max_length=255)
 
 
 class JobLog(BaseModel):
@@ -114,9 +131,9 @@ class JobLog(BaseModel):
     def __unicode__(self):
         return 'Job Log #%s: %s' % (self.id, self.job)
 
-class Job(BaseModel):
+
+class JobBase(BaseModel):
     name = models.CharField(max_length=255)
-    project = models.ForeignKey(Project, related_name='jobs')
 
     def _create_log(self, branch):
         job_log = JobLog()
@@ -151,13 +168,13 @@ class Job(BaseModel):
             return lasts[0]
 
     def last_success(self):
-        logs = self.logs.filter(status='success').order_by('-end')
+        logs = self.logs.filter(status='success').order_by('-begin')
         if len(logs) > 0:
             return logs[0]
 
 
     def last_failure(self):
-        logs =  self.logs.filter(status='failure').order_by('-end')
+        logs =  self.logs.filter(status='failure').order_by('-begin')
         if len(logs) > 0:
             return logs[0]
 
@@ -165,7 +182,7 @@ class Job(BaseModel):
         if hasattr(self, '_last_run'):
             return self._last_run
         else:
-            logs =  self.logs.order_by('-end')
+            logs =  self.logs.order_by('-begin')
             if len(logs) > 0:
                 self._last_run = logs[0]
             else:
@@ -176,9 +193,36 @@ class Job(BaseModel):
         if self.last_run() is not None:
             return self.last_run().duration()
 
-class Builder(BaseModel):
+    class Meta:
+        abstract = True
+
+
+class JobTemplate(JobBase):
+    project_template = models.ForeignKey(ProjectTemplate,
+                                         related_name='job_templates',
+                                         blank=True, null=True)
+    project = models.ForeignKey(Project, related_name='+',
+                                blank=True, null=True)
+
+class Job(JobBase):
+    project = models.ForeignKey(Project, related_name='jobs')
+
+
+class BaseBuilder(BaseModel):
     name = models.CharField(max_length=255)
     class_name = models.CharField(max_length=255)
+    content = models.TextField(blank=True) # for template or other
+    html_template = models.TextField(blank=True)
+    class Meta:
+        abstract = True
+
+
+class Builder(BaseBuilder):
+    pass
+
+
+class PostBuilder(BaseBuilder):
+    condition = models.TextField()
 
 
 class BuildLog(BaseModel):
@@ -191,7 +235,7 @@ class BuildLog(BaseModel):
     job = models.ForeignKey(Job, related_name='build_logs')
     job_log = models.ForeignKey(JobLog, related_name='build_logs',
                                 null=True)
-    command = models.TextField()
+    content = models.TextField() #for save command etc
     output = models.TextField()
     error = models.TextField()
     sequence = models.PositiveIntegerField(default=1)
@@ -201,22 +245,13 @@ class BuildLog(BaseModel):
     branch = models.ForeignKey(ProjectBranch, null=True, blank=True)
 
 
-class Build(BaseModel):
+class BaseBuild(BaseModel):
     """
     Model ini untuk menampung perintah yang akan dilakukan terhadap
     project yang dikelola
     """
 
-    COMMAND_TYPE_CHOICES = (
-        ('bash', 'BASH'),
-        ('python', 'Python Command'),
-        ('python_function', 'Python Function Module'),
-        ('python_class', 'Python Class Module')
-    )
-
-    job = models.ForeignKey(Job, related_name='builds')
-    builder = models.ForeignKey(Builder, related_name='+')
-    command = models.TextField()
+    content = models.TextField()
     sequence = models.PositiveIntegerField(default=1)
 
     def save(self):
@@ -225,53 +260,38 @@ class Build(BaseModel):
             if last_build is not None:
                 self.sequence = last_build.sequence + 1
 
-        self.command = self.command.replace('\r\n', '\n')
-        self.command = self.command.replace('\r', '\n')
+        self.content = self.content.replace('\r\n', '\n')
+        self.content = self.content.replace('\r', '\n')
         return super(Build, self).save()
-
-
-    def _create_log(self, job_log):
-        build_log = BuildLog()
-        build_log.build = self
-        build_log.sequence = self.sequence
-        build_log.job = self.job
-        build_log.job_log = job_log
-        build_log.command = self.command
-        build_log.begin = current_tz.localize(datetime.now())
-        return build_log
-
-    def _save_log(self, build_log, output_list, error_list):
-        if len(error_list) > 0:
-            build_log.status = 'failure'
-        else:
-            build_log.status = 'success'
-        build_log.output = ''.join(output_list)
-        build_log.error = ''.join(error_list)
-        build_log.end = current_tz.localize(datetime.now())
-        build_log.save()
-
-
-    def _run_bash(self, ssh_client, job_log):
-        build_log = self._create_log(job_log)
-        ssh_client.connect()
-        ssh_client.add_command(self.command)
-        stdin, stdout, stderr = ssh_client.execute()
-        output_list, error_list = stdout.readlines(), stderr.readlines()
-        ssh_client.close()
-        self._save_log(build_log, output_list, error_list)
-        return build_log.status
 
     def get_builder_object(self, job_log):
         if not hasattr(self, '_builder_object'):
-            module_path, builder_class_str = self.builder.class_name\
-                                                 .rsplit('.', 1)
-            module = importlib.import_module(module_path)
-            builder_class = getattr(module, builder_class_str)
-            self._builder_object = builder_class(self, job_log)
+            self._builder_object = get_obj(self.builder.class_name,
+                                           [self, job_log])
         return self._builder_object
 
     def run(self, job_log):
         builder = self.get_builder_object(job_log)
         builder.build_run()
         return builder.get_log().status
+
+    class Meta:
+        abstract = True
+
+
+class BuildTemplate(BaseBuild):
+    job = models.ForeignKey(JobTemplate, related_name='builds')
+    builder = models.ForeignKey(Builder, related_name='+')
+
+class PostBuildTemplate(BaseBuild):
+    job = models.ForeignKey(JobTemplate, related_name='post_builds')
+    builder = models.ForeignKey(PostBuilder, related_name='+')
+
+class Build(BaseBuild):
+    job = models.ForeignKey(Job, related_name='builds')
+    builder = models.ForeignKey(Builder, related_name='+')
+
+class PostBuild(BaseBuild):
+    job = models.ForeignKey(Job, related_name='post_builds')
+    builder = models.ForeignKey(PostBuilder, related_name='+')
 

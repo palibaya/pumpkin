@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Pumpkin - Create a new project{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row new-project">
+        <h3>Create project successful!</h3>
+        <p class="text-center">
+            <a class="btn btn-primary" href="{% url 'pumpkin.views.project' identifier=project.identifier %}">Go to project</a>
+        </p>
+
+    </div>
+</div>
+{% endblock content %}

@@ -81,12 +81,26 @@ h3.project-name{
 .project-content {
     background-color: #ffffff;
     padding: 20px 0 50px;
+    border-bottom: 1px solid #CCCCCC;
 }
+
+.new-project {
+    background-color: #ffffff;
+    margin-top:20px;
+    border: 1px solid #CCCCCC;
+}
+
+.new-project h3 {
+    border-bottom: 1px solid #CCCCCC;
+    margin: 20px 30px 20px;
+    font-weight:normal;
+    padding-bottom: 10px;
+}
+
 
 footer{
     text-align: center;
-    border-top: 1px solid #CCCCCC;
-    padding-top: 40px;
+    padding-top: 30px;
     padding-bottom: 40px;
     font-size: small;
 

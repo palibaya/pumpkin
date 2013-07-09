@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Pumpkin - Create a new project{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row new-project">
+        <h3>Create a new project - {% block step_label %} Base {% endblock step_label %}</h3>
+        <div class="span6">
+            <form class="form-horizontal" method="post">
+                {% csrf_token %}
+
+                {{ wizard.management_form }}
+
+                {% if wizard.form.forms %}
+                    {{ wizard.form.management_form }}
+                    {% for form in wizard.form.forms %}
+                        {{ form.as_p }}
+                    {% endfor %}
+
+                {% else %}
+                    {% for field in wizard.form %}
+                    <div class="control-group">
+                        <label class="control-label" for="{{ field.name }}">{{ field.label }}</label>
+                        <div class="controls">
+                            {{ field | append_attr:"class:span4" }}
+                            {{ field.errors }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="control-group">
+                    <div class="controls pull-right">
+                        {% if wizard.steps.prev %}
+                        <button name="wizard_goto_step" type="submit" class="btn" value="{{ wizard.steps.prev }}">Back</button>
+                        {% endif %}
+
+                        <button name="submit" type="submit" class="btn btn-primary">{% block submit_label %} Next {% endblock submit_label%}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
